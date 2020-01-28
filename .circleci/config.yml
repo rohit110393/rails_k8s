@@ -5,7 +5,7 @@ jobs:
     docker:
       - image: circleci/buildpack-deps:stretch
     environment:
-      IMAGE_NAME: rohit110393/rails_k8s
+      IMAGE_NAME: roohhiit110393/rails_k8s
     steps:
       - checkout
       - setup_remote_docker
