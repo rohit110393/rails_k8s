@@ -10,7 +10,7 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
-          name: Build and Push Docker image
+          name: Build and Puush Docker image
           command: |
             IMAGE_TAG=${CIRCLE_TAG}
             echo "$IMAGE_TAG" > version
