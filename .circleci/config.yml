@@ -1,0 +1,19 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/rails_k8s
+    docker:
+      - image: circleci/buildpack-deps:stretch
+    environment:
+      IMAGE_NAME: rohit110393/rails_k8s
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build and Push Docker image
+          command: |
+            IMAGE_TAG=${CIRCLE_TAG}
+            echo "$IMAGE_TAG" > version
+            echo "$DOCKERHUB_PASS" | docker login -u roohhiit110393 -p $DOCKERHUB_PASSWORD
+            docker build -f docker/app/Dockerfile -t $IMAGE_NAME:latest .
+            docker push $IMAGE_NAME:latest
