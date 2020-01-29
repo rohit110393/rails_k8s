@@ -51,6 +51,10 @@ jobs:
           name: Setup IAM OIDC PROVIDER
           command: eksctl utils associate-iam-oidc-provider --cluster=$EKS_CLUSTER_NAME --approve
       - run:
+        name: Kubeadm
+        command: kubeadm init
+
+      - run:
           name: Create RBAC policy
           command: kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.4/docs/examples/rbac-role.yaml
       - run:
