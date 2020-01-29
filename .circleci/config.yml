@@ -25,7 +25,7 @@ jobs:
       - checkout
       - run:
           name: Install AWS CLI
-          command: export sudo apt-get update && sudo apt-get install -y awscli
+          command: sudo apt-get update && sudo apt-get install -y awscli
       - run:
           name: Install and configure kubectl
           command: sudo curl -L https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl && sudo chmod +x /usr/local/bin/kubectl
@@ -35,9 +35,9 @@ jobs:
       - run:
           name: Install latest awscli version
           command: sudo apt install unzip && curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" && unzip awscli-bundle.zip &&./awscli-bundle/install -b ~/bin/aws
-      - run:
-          name: Get the kubeconfig file
-          command: export KUBECONFIG=$HOME/.kube/kubeconfig && /home/circleci/bin/aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
+      # - run:
+      #     name: Get the kubeconfig file
+      #     command: export KUBECONFIG=$HOME/.kube/kubeconfig && /home/circleci/bin/aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
 
 workflows:
   version: 2
