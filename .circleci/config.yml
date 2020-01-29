@@ -20,7 +20,7 @@ jobs:
   build:
     working_directory: ~/rails_k8s
     machine:
-      - image: ubuntu-1604:201903-01
+      image: ubuntu-1604:201903-01
     steps:
       - checkout
       - run:
