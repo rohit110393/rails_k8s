@@ -59,13 +59,7 @@ jobs:
       #       command: kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.4/docs/examples/rbac-role.yaml
       - run:
           name: Create IAM Service account
-          command: eksctl create iamserviceaccount \
-            --cluster=$EKS_CLUSTER_NAME \
-            --namespace=kube-system \
-            --name=alb-ingress-controller \
-            --attach-policy-arn=$ALBIngressControllerIAMPolicy \
-            --override-existing-serviceaccounts \
-            --approve
+          command: eksctl create iamserviceaccount --cluster=$EKS_CLUSTER_NAME --namespace=kube- --name=alb-ingress-controller --attach-policy-arn=$ALBIngressControllerIAMPolicy --override-existing-serviceaccounts --approve
       - run:
           name: Creating ALB ingress controller
           command: curl -sS "https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.4/docs/      examples/alb-ingress-controller.yaml" sed "s/# - --cluster-name=devCluster/- --cluster-name=$EKS_CLUSTER_NAME/g" | kubectl apply -f -
