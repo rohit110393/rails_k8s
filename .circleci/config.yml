@@ -10,10 +10,40 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
-          name: Build and Puush Docker image
+          name: Build and Push Docker image
           command: |
             IMAGE_TAG=${CIRCLE_TAG}
             echo "$IMAGE_TAG" > version
             echo "$DOCKERHUB_PASS" | docker login -u roohhiit110393 -p $DOCKERHUB_PASSWORD
             docker build  -t $IMAGE_NAME:latest .
             docker push $IMAGE_NAME:latest
+  deploy:
+    machine:
+      - image: circleci/classic:latest
+    steps:
+      -run:
+        name: Install AWS CLI
+        command: export sudo apt-get update && sudo apt-get install -y awscli
+      -run:
+        name: Install and configure kubectl
+        command: sudo curl -L https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl && sudo chmod +x /usr/local/bin/kubectl  
+      -run:
+        name: Install and configure kubectl aws-iam-authenticator
+        command: curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.10.3/2018-07-26/bin/linux/amd64/aws-iam-authenticator && sudo chmod +x ./aws-iam-authenticator && sudo cp ./aws-iam-authenticator /bin/aws-iam-authenticator
+      -run:
+        name: Install latest awscli version
+        command: sudo apt install unzip && curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" && unzip awscli-bundle.zip &&./awscli-bundle/install -b ~/bin/aws
+      - run: 
+          name: Get the kubeconfig file 
+          command: export KUBECONFIG=$HOME/.kube/kubeconfig && /home/circleci/bin/aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
+          
+          
+workflows:
+  version: 2
+  build_and_tag:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+
