@@ -41,7 +41,9 @@ jobs:
       - run:
           name: Install eksctl
           command: curl --silent --location "https://github.com/weaveworks/eksctl/releases/download/latest_release/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp && sudo mv /tmp/eksctl /usr/local/bin && eksctl version
-
+      - run:
+          name: Get the kubeconfig file
+          command: export KUBECONFIG=$HOME/.kube/kubeconfig && /home/circleci/bin/aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
       - run:
           name: Create EKS cluster
           command: chmod +x exec.sh && bash exec.sh eksctl create cluster --name=$EKS_CLUSTER_NAME
