@@ -50,10 +50,10 @@ jobs:
           command: eksctl utils associate-iam-oidc-provider --cluster=$EKS_CLUSTER_NAME --approve
       - run:
           name: Create RBAC policy
-          run: kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.4/docs/examples/rbac-role.yaml
+          command: kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.4/docs/examples/rbac-role.yaml
       - run:
           name: Create IAM Service account
-          run: eksctl create iamserviceaccount \
+          command: eksctl create iamserviceaccount \
             --cluster=$EKS_CLUSTER_NAME \
             --namespace=kube-system \
             --name=alb-ingress-controller \
@@ -62,7 +62,7 @@ jobs:
             --approve
       - run:
           name: Creating ALB ingress controller
-          run: curl -sS "https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.4/docs/      examples/alb-ingress-controller.yaml" sed "s/# - --cluster-name=devCluster/- --cluster-name=$EKS_CLUSTER_NAME/g" | kubectl apply -f -
+          command: curl -sS "https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.4/docs/      examples/alb-ingress-controller.yaml" sed "s/# - --cluster-name=devCluster/- --cluster-name=$EKS_CLUSTER_NAME/g" | kubectl apply -f -
       - run:
           name: Deploy
           command: bash deploy.sh
