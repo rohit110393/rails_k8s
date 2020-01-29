@@ -50,13 +50,13 @@ jobs:
       - run:
           name: Setup IAM OIDC PROVIDER
           command: eksctl utils associate-iam-oidc-provider --cluster=$EKS_CLUSTER_NAME --approve
-      - run:
-          name: Kubeadm
-          command: sudo cp /etc/kubernetes/admin.conf $HOME/ && sudo chown $(id -u):$(id -g) $HOME/admin.conf && export KUBECONFIG=$HOME/admin.conf
+      #   - run:
+      #       name: Kubeadm
+      #       command: sudo cp /etc/kubernetes/admin.conf $HOME/ && sudo chown $(id -u):$(id -g) $HOME/admin.conf && export KUBECONFIG=$HOME/admin.conf
 
-      - run:
-          name: Create RBAC policy
-          command: kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.4/docs/examples/rbac-role.yaml
+      #   - run:
+      #       name: Create RBAC policy
+      #       command: kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.4/docs/examples/rbac-role.yaml
       - run:
           name: Create IAM Service account
           command: eksctl create iamserviceaccount \
