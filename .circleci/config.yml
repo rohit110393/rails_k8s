@@ -50,16 +50,26 @@ jobs:
       - run:
           name: Setup IAM OIDC PROVIDER
           command: eksctl utils associate-iam-oidc-provider --cluster=$EKS_CLUSTER_NAME --approve
-      #   - run:
-      #       name: Kubeadm
-      #       command: sudo cp /etc/kubernetes/admin.conf $HOME/ && sudo chown $(id -u):$(id -g) $HOME/admin.conf && export KUBECONFIG=$HOME/admin.conf
+      - run:
+          name: Install Kubeadm
+          run: |
+            curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+            cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
+            deb https://apt.kubernetes.io/ kubernetes-xenial main
+            EOF
+            sudo apt-get install -y kubelet kubeadm kubectl
+            sudo apt-mark hold kubelet kubeadm kubectl
+            kubeadm init --ignore-preflight-errors=all
+      - run:
+          name: Kubeadm
+          command: sudo cp /etc/kubernetes/admin.conf $HOME/ && sudo chown $(id -u):$(id -g) $HOME/admin.conf && export KUBECONFIG=$HOME/admin.conf
 
-      #   - run:
-      #       name: Create RBAC policy
-      #       command: kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.4/docs/examples/rbac-role.yaml
-      #   - run:
-      #       name: Create IAM Service account
-      #       command: eksctl create iamserviceaccount --cluster=$EKS_CLUSTER_NAME --namespace=kube-system  --name=alb-ingress-controller --attach-policy-arn=$ALBIngressControllerIAMPolicy --override-existing-serviceaccounts --approve
+      - run:
+          name: Create RBAC policy
+          command: kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.4/docs/examples/rbac-role.yaml
+      - run:
+          name: Create IAM Service account
+          command: eksctl create iamserviceaccount --cluster=$EKS_CLUSTER_NAME --namespace=kube-system  --name=alb-ingress-controller --attach-policy-arn=$ALBIngressControllerIAMPolicy --override-existing-serviceaccounts --approve
       - run:
           name: Creating ALB ingress controller
           command: curl -sS "https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.4/docs/      examples/alb-ingress-controller.yaml" sed "s/# - --cluster-name=devCluster/- --cluster-name=$EKS_CLUSTER_NAME/g" | kubectl apply -f -
