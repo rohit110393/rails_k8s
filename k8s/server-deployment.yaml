@@ -24,3 +24,24 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
+          env:
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: password
+                  key: PASSWORD
+            - name: USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: username
+                  key: USERNAME
+            - name: DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: database
+                  key: DATABASE
+            - name: PORT
+              valueFrom:
+                secretKeyRef:
+                  name: port
+                  key: PORT

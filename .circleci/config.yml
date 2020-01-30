@@ -1,23 +1,26 @@
 version: 2
 jobs:
-  # build:
-  #   working_directory: ~/rails_k8s
-  #   docker:
-  #     - image: circleci/buildpack-deps:stretch
-  #   environment:
-  #     IMAGE_NAME: roohhiit110393/rails_k8s
-  #   steps:
-  #     - checkout
-  #     - setup_remote_docker
-  #     - run:
-  #         name: Build and Push Docker image
-  #         command: |
-  #           IMAGE_TAG=${CIRCLE_TAG}
-  #           echo "$IMAGE_TAG" > version
-  #           echo "$DOCKERHUB_PASS" | docker login -u roohhiit110393 -p $DOCKERHUB_PASSWORD
-  #           docker build  -t $IMAGE_NAME:latest .
-  #           docker push $IMAGE_NAME:latest
   build:
+    working_directory: ~/rails_k8s
+    docker:
+      - image: circleci/buildpack-deps:stretch
+    environment:
+      IMAGE_NAME: $DOCKERHUB_ACCOUNT/rails_k8s
+      SHA: $(git rev-parse HEAD)
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build and Push Docker image
+          command: |
+            IMAGE_TAG=${CIRCLE_TAG}
+            echo "$IMAGE_TAG" > version
+            echo "$DOCKERHUB_PASSWORD" | docker login -u $DOCKERHUB_ACCOUNT -p $DOCKERHUB_PASSWORD
+            docker build -t $IMAGE_NAME:$SHA 
+            docker push $IMAGE_NAME:latest
+            docker push $IMAGE_NAME:$SHA
+
+  deploy:
     working_directory: ~/rails_k8s
     machine:
       image: ubuntu-1604:201903-01
@@ -32,9 +35,6 @@ jobs:
       - run:
           name: Install and configure kubectl
           command: sudo curl -L https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl && sudo chmod +x /usr/local/bin/kubectl
-      - run:
-          name: EXport tag
-          command: echo 'export TAG=$0.0.1' >> $BASH_ENV
       - run:
           name: Install and configure kubectl aws-iam-authenticator
           command: curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.10.3/2018-07-26/bin/linux/amd64/aws-iam-authenticator && sudo chmod +x ./aws-iam-authenticator && sudo cp ./aws-iam-authenticator /bin/aws-iam-authenticator
@@ -52,31 +52,27 @@ jobs:
           command: |
             cat $HOME/.kube/kubeconfig
       - run:
-          name: Running the app
+          name: Creating the secret
           command: |
             export KUBECONFIG=$HOME/.kube/kubeconfig
-            kubectl get pods --all-namespaces
-      # - run:
-      #     name: Install and configuire helm
-      #     command: sudo curl -L https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-linux-amd64.tar.gz | tar xz && sudo mv linux-amd64/helm /bin/helm && sudo rm -rf linux-amd64
-      # - run:
-      #     name: Initialize helm
-      #     command: helm init --client-only --kubeconfig=$HOME/.kube/kubeconfig
-      # - run:
-      #     name: Install tiller plugin
-      #     command: helm plugin install https://github.com/rimusz/helm-tiller --kubeconfig=$HOME/.kube/kubeconfig
-      # - run:
-      #     name: Release helloapp using helm chart
-      #     command: bash release.sh $TAG
-      # - run:
-      #     name: ALB end point
-      #     command: kubectl get ingress/backend-ingress -n backend
+            bash exec.sh kubectl create secret generic database --from-literal=database=$DATABASE --namespace='backend'
+            bash exec.sh kubectl create secret generic username --from-literal=username=$USERNAME --namespace='backend'
+            bash exec.sh kubectl create secret generic password --from-literal=password=$PASSWORD --namespace='backend'
+            bash exec.sh kubectl create secret generic host --from-literal=host=$HOST --namespace='backend'
+            bash exec.sh kubectl create secret generic port --from-literal=port=$PORT --namespace='backend'
+      - run:
+          name: Deploying the app
+          command: |
+            export KUBECONFIG=$HOME/.kube/kubeconfig
+            kubectl apply -f k8s 
+            kubectl set image deployments/server-deployment server=$IMAGE:$SHA
+            kubectl get  ingress --namespace  backend
 
 workflows:
   version: 2
   build_and_tag:
     jobs:
       - build
-      # - deploy:
-      #     requires:
-      #       - build
+      - deploy:
+          requires:
+            - build

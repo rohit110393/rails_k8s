@@ -5,15 +5,11 @@ default: &default
   username: root
   host: localhost
   port: 3306
-  password: amagi123
+  password: test
 
 development:
   <<: *default
-  database: rails_k8s_production
-  username: admin
-  host: database-2.cdmxdkzbvdjm.ap-south-1.rds.amazonaws.com
-  port: 3306
-  password: amagi123
+  database: rails_k8s_development
 
 test:
   <<: *default
@@ -21,8 +17,8 @@ test:
 
 production:
   <<: *default
-  database: rails_k8s_production
-  username: admin
-  host: database-2.cdmxdkzbvdjm.ap-south-1.rds.amazonaws.com
-  port: 3306
-  password: amagi123
+  database: <%= ENV.fetch("PGDATABASE") %>
+  username: <%= ENV.fetch("PGUSERNAME") %>
+  host: <%= ENV.fetch("PGHOST") %>
+  port: <%= ENV.fetch("PGPORT") %>
+  password: <%= ENV.fetch("PGPASSWORD") %>
