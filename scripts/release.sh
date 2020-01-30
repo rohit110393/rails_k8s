@@ -6,9 +6,9 @@ helm tiller start-ci
 export HELM_HOST=127.0.0.1:44134
 result=$(eval helm ls | grep helloapp) 
 if [ $? -ne "0" ]; then 
-   helm install  --name helloapp --set image.tag=$TAG charts/helloapp
+   helm install --timeout 180  --name helloapp --set image.tag=$TAG 
 else 
-   helm upgrade --name helloapp --set image.tag=$TAG charts/helloapp
+   helm upgrade --timeout 180  --name helloapp --set image.tag=$TAG 
 fi
 echo "stop tiller"
 helm tiller stop 
