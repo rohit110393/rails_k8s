@@ -52,7 +52,7 @@ jobs:
           command: eksctl utils associate-iam-oidc-provider --cluster=$EKS_CLUSTER_NAME --approve
       - run:
           name: Install Kubeadm
-          run: |
+          command: |
             curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
             cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
             deb https://apt.kubernetes.io/ kubernetes-xenial main
