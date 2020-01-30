@@ -5,7 +5,7 @@ jobs:
     docker:
       - image: circleci/buildpack-deps:stretch
     environment:
-      IMAGE_NAME: $DOCKERHUB_ACCOUNT/rails_k8s
+      IMAGE_NAME: "$DOCKERHUB_ACCOUNT"/rails_k8s
       SHA: $(git rev-parse HEAD)
     steps:
       - checkout
