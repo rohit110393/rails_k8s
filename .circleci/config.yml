@@ -6,7 +6,7 @@ jobs:
       - image: circleci/buildpack-deps:stretch
     environment:
       IMAGE_NAME: roohhiit110393/rails_k8s
-      SHA: $(git rev-parse HEAD)
+      SHA: $(echo $CIRCLE_SHA1 | cut -c -7)
     steps:
       - checkout
       - setup_remote_docker
