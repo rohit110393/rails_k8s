@@ -51,7 +51,7 @@ jobs:
           name: checking the config
           command: |
             cat $HOME/.kube/kubeconfig
-      - name:
+      - run:
           name: Running the app
           command: kubectl get pods --all-namespaces
       # - run:
