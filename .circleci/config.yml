@@ -33,6 +33,9 @@ jobs:
           name: Install and configure kubectl
           command: sudo curl -L https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl && sudo chmod +x /usr/local/bin/kubectl
       - run:
+          name: EXport tag
+          command: echo 'export TAG=$0.0.1' >> $BASH_ENV
+      - run:
           name: Install and configure kubectl aws-iam-authenticator
           command: curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.10.3/2018-07-26/bin/linux/amd64/aws-iam-authenticator && sudo chmod +x ./aws-iam-authenticator && sudo cp ./aws-iam-authenticator /bin/aws-iam-authenticator
       - run:
@@ -55,13 +58,7 @@ jobs:
           command: helm plugin install https://github.com/rimusz/helm-tiller --kubeconfig=$HOME/.kube/kubeconfig
       - run:
           name: Release helloapp using helm chart
-          command: bash release.sh latest
-      # - run:
-      #     name: apply kubeconfig
-      #     command: kubectl apply -f k8s/k8s_rails-namespace.yaml
-      # - run:
-      #     name: Deploy
-      #     command: bash deploy.sh
+          command: bash release.sh $TAG
       # - run:
       #     name: ALB end point
       #     command: kubectl get ingress/backend-ingress -n backend

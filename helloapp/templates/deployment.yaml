@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: server
-          image: roohhiit110393/rails_k8s
-          imagePullPolicy: Always
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.imagePullPolicy }}
           ports:
             - containerPort: 3000

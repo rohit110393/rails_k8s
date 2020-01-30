@@ -4,9 +4,9 @@ metadata:
   name: server-nodeport-service
   namespace: backend
 spec:
-  type: NodePort
+  type: { { .Values.service.type } }
   selector:
     component: server
   ports:
-    - port: 80
-      targetPort: 3000
+    - port: { { .Values.service.port } }
+      targetPort: { { .Values.service.targetPort } }

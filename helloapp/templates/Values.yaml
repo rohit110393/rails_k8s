@@ -1,0 +1,13 @@
+image:
+  tag: 0.0.1
+  repository: roohhiit110393/rails_k8s
+  imagePullPolicy: Always
+
+labels:
+  env: "staging"
+  cluster: "eks-cluster"
+
+service:
+  port: 80
+  targetPort: 3000
+  type: LoadBalancer
