@@ -44,38 +44,39 @@ jobs:
       - run:
           name: Get the kubeconfig file
           command: export KUBECONFIG=$HOME/.kube/kubeconfig && /home/circleci/bin/aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
-      - run:
-          name: Create EKS cluster
-          command: chmod +x exec.sh && bash exec.sh eksctl create cluster --name=$EKS_CLUSTER_NAME
-      - run:
-          name: Setup IAM OIDC PROVIDER
-          command: eksctl utils associate-iam-oidc-provider --cluster=$EKS_CLUSTER_NAME --approve
-      - run:
-          name: Install Kubeadm
-          command: |
-            curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-            cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
-            deb https://apt.kubernetes.io/ kubernetes-xenial main
-            EOF
-            sudo apt-get update
-            sudo apt-get install -y kubelet kubeadm kubectl
-            sudo apt-mark hold kubelet kubeadm kubectl
-            sudo kubeadm init --pod-network-cidr=192.168.0.0/16 --ignore-preflight-errors=all
-      - run:
-          name: Kubeadm
-          command: sudo cp /etc/kubernetes/admin.conf $HOME/ && sudo chown $(id -u):$(id -g) $HOME/admin.conf && export KUBECONFIG=$HOME/admin.conf
+
+      #   - run:
+      #       name: Create EKS cluster
+      #       command: chmod +x exec.sh && bash exec.sh eksctl create cluster --name=$EKS_CLUSTER_NAME
+      #   - run:
+      #       name: Setup IAM OIDC PROVIDER
+      #       command: eksctl utils associate-iam-oidc-provider --cluster=$EKS_CLUSTER_NAME --approve
+      #   - run:
+      #       name: Install Kubeadm
+      #       command: |
+      #         curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+      #         cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
+      #         deb https://apt.kubernetes.io/ kubernetes-xenial main
+      #         EOF
+      #         sudo apt-get update
+      #         sudo apt-get install -y kubelet kubeadm kubectl
+      #         sudo apt-mark hold kubelet kubeadm kubectl
+      #         sudo kubeadm init --pod-network-cidr=192.168.0.0/16 --ignore-preflight-errors=all
+      #   - run:
+      #       name: Kubeadm
+      #       command: sudo cp /etc/kubernetes/admin.conf $HOME/ && sudo chown $(id -u):$(id -g) $HOME/admin.conf && export KUBECONFIG=$HOME/admin.conf
       - run:
           name: apply kubeconfig
           command: kubectl apply -f k8s/k8s_rails-namespace.yaml
-      - run:
-          name: Create RBAC policy
-          command: kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.4/docs/examples/rbac-role.yaml
-      - run:
-          name: Create IAM Service account
-          command: eksctl create iamserviceaccount --cluster=$EKS_CLUSTER_NAME --namespace=kube-system  --name=alb-ingress-controller --attach-policy-arn=$ALBIngressControllerIAMPolicy --override-existing-serviceaccounts --approve
-      - run:
-          name: Creating ALB ingress controller
-          command: curl -sS "https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.4/docs/      examples/alb-ingress-controller.yaml" sed "s/# - --cluster-name=devCluster/- --cluster-name=$EKS_CLUSTER_NAME/g" | kubectl apply -f -
+      #   - run:
+      #       name: Create RBAC policy
+      #       command: kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.4/docs/examples/rbac-role.yaml
+      #   - run:
+      #       name: Create IAM Service account
+      #       command: eksctl create iamserviceaccount --cluster=$EKS_CLUSTER_NAME --namespace=kube-system  --name=alb-ingress-controller --attach-policy-arn=$ALBIngressControllerIAMPolicy --override-existing-serviceaccounts --approve
+      #   - run:
+      #       name: Creating ALB ingress controller
+      #       command: curl -sS "https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.4/docs/      examples/alb-ingress-controller.yaml" sed "s/# - --cluster-name=devCluster/- --cluster-name=$EKS_CLUSTER_NAME/g" | kubectl apply -f -
       - run:
           name: Deploy
           command: bash deploy.sh
