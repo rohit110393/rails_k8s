@@ -60,7 +60,7 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y kubelet kubeadm kubectl
             sudo apt-mark hold kubelet kubeadm kubectl
-            kubeadm init --ignore-preflight-errors=all
+            sudo kubeadm init --ignore-preflight-errors=all
       - run:
           name: Kubeadm
           command: sudo cp /etc/kubernetes/admin.conf $HOME/ && sudo chown $(id -u):$(id -g) $HOME/admin.conf && export KUBECONFIG=$HOME/admin.conf
