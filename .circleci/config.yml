@@ -53,7 +53,9 @@ jobs:
             cat $HOME/.kube/kubeconfig
       - run:
           name: Running the app
-          command: kubectl get pods --all-namespaces
+          command: |
+            export KUBECONFIG=$HOME/.kube/kubeconfig
+            kubectl get pods --all-namespaces
       # - run:
       #     name: Install and configuire helm
       #     command: sudo curl -L https://storage.googleapis.com/kubernetes-helm/helm-v2.11.0-linux-amd64.tar.gz | tar xz && sudo mv linux-amd64/helm /bin/helm && sudo rm -rf linux-amd64
