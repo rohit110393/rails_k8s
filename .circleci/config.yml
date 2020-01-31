@@ -17,6 +17,7 @@ jobs:
             echo "$IMAGE_TAG" > version
             echo "$DOCKERHUB_PASSWORD" | docker login -u roohhiit110393 -p $DOCKERHUB_PASSWORD
             docker build -t $IMAGE_NAME:$SHA . 
+            docker build -t $IMAGE_NAME:latest . 
             docker push $IMAGE_NAME:latest 
             docker push $IMAGE_NAME:$SHA
 
